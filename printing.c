@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <ncurses.h>
+#include <u.h>
+#include <libc.h>
 #include "dungeon_generator.h"
 
 

@@ -1,6 +1,5 @@
-#include <stdlib.h>
-#include <string.h>
-
+#include <u.h>
+#include <libc.h>
 #include "binheap.h"
 
 #define BINHEAP_START_SIZE 128

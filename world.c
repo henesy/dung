@@ -1,5 +1,5 @@
-#include <stdlib.h>
-#include <math.h>
+#include <u.h>
+#include <libc.h>
 #include "dungeon_generator.h"
 
 
