@@ -6,12 +6,12 @@
 
 struct binheap_node {
   void *datum;
-  uint32_t index;
+  u32int index;
 };
 
-static void percolate_up(binheap_t *h, uint32_t index)
+static void percolate_up(binheap_t *h, u32int index)
 {
-  uint32_t parent;
+  u32int parent;
   binheap_node_t *tmp;
 
   for (parent = (index - 1) / 2;
@@ -25,9 +25,9 @@ static void percolate_up(binheap_t *h, uint32_t index)
   } 
 }
 
-static void percolate_down(binheap_t *h, uint32_t index)
+static void percolate_down(binheap_t *h, u32int index)
 {
-  uint32_t child;
+  u32int child;
   void *tmp;
 
   for (child = (2 * index) + 1;
@@ -49,7 +49,7 @@ static void percolate_down(binheap_t *h, uint32_t index)
 
 static void heapify(binheap_t *h)
 {
-  uint32_t i;
+  u32int i;
 
   for (i = (h->size + 1) / 2; i; i--) {
     percolate_down(h, i);
@@ -58,7 +58,7 @@ static void heapify(binheap_t *h)
 }
 
 void binheap_init(binheap_t *h,
-                  int32_t (*compare)(const void *key, const void *with),
+                  s32int (*compare)(const void *key, const void *with),
                   void (*datum_delete)(void *))
 {
   h->size = 0;
@@ -71,13 +71,13 @@ void binheap_init(binheap_t *h,
 
 void binheap_init_from_array(binheap_t *h,
                              void *array,
-                             uint32_t size,
-                             uint32_t nmemb,
-                             int32_t (*compare)(const void *key,
+                             u32int size,
+                             u32int nmemb,
+                             s32int (*compare)(const void *key,
                                                 const void *with),
                              void (*datum_delete)(void *))
 {
-  uint32_t i;
+  u32int i;
   char *a;
 
   h->size = h->array_size = nmemb;
@@ -97,7 +97,7 @@ void binheap_init_from_array(binheap_t *h,
 
 void binheap_delete(binheap_t *h)
 {
-  uint32_t i;
+  u32int i;
 
   for (i = 0; i < h->size; i++) {
     if (h->datum_delete) {
@@ -136,7 +136,7 @@ binheap_node_t *binheap_insert(binheap_t *h, void *v)
 
 void *binheap_peek_min(binheap_t *h)
 {
-  return h->size ? h->array[0]->datum : NULL;
+  return h->size ? h->array[0]->datum : nil;
 }
 
 void *binheap_remove_min(binheap_t *h)
@@ -144,7 +144,7 @@ void *binheap_remove_min(binheap_t *h)
   void *tmp;
 
   if (!h->size) {
-    return NULL;
+    return nil;
   }
 
   tmp = h->array[0]->datum;
@@ -161,7 +161,7 @@ void binheap_decrease_key(binheap_t *h, binheap_node_t *n)
   percolate_up(h, n->index);
 }
 
-uint32_t binheap_is_empty(binheap_t *h)
+u32int binheap_is_empty(binheap_t *h)
 {
   return !h->size;
 }
@@ -170,24 +170,24 @@ uint32_t binheap_is_empty(binheap_t *h)
 
 #include <stdio.h>
 
-int32_t compare_int(const void *key, const void *with)
+s32int compare_int(const void *key, const void *with)
 {
-  return *(const int32_t *) key - *(const int32_t *) with;
+  return *(const s32int *) key - *(const s32int *) with;
 }
 
 int main(int argc, char *argv[])
 {
   binheap_t h;
-  int32_t a[1024];
-  int32_t i, j, r;
-  int32_t parent, child;
+  s32int a[1024];
+  s32int i, j, r;
+  s32int parent, child;
   binheap_node_t *nodes[1024];
 
   for (i = 0; i < 1024; i++) {
     a[i] = 1024 - i;
   }
 
-  binheap_init(&h, compare_int, NULL);
+  binheap_init(&h, compare_int, nil);
   for (i = 0; i < 1024; i++) {
     binheap_insert(&h, a + i);
   }
@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
 
   binheap_delete(&h);
 
-  binheap_init_from_array(&h, a, sizeof (*a), 1024, compare_int, NULL);
+  binheap_init_from_array(&h, a, sizeof (*a), 1024, compare_int, nil);
 
   for (i = 0; i < 1024; i++) {
     parent = (i - 1) / 2;
@@ -314,7 +314,7 @@ int main(int argc, char *argv[])
 
   binheap_delete(&h);
 
-  binheap_init(&h, compare_int, NULL);
+  binheap_init(&h, compare_int, nil);
   for (i = 0; i < 1024; i++) {
     nodes[i] = binheap_insert(&h, a + i);
   }
