@@ -130,18 +130,18 @@ int all_connected(int * cnxns, Dungeon * dungeon) {
 /* generates and marks corridors */
 void gen_corridors(Dungeon * dungeon) {
 	int i;
-	int connected[dungeon->nr];
+	int *connected = calloc(dungeon->nr, sizeof(int));
 	for(i = 0; i < dungeon->nr; i++) {
 		connected[i] = 0;
 	}
 	//memset(connected, 0, dungeon->nr * sizeof(int));
-	double dists[dungeon->nr];
+	double *dists = calloc(dungeon->nr, sizeof(double));
 	for(i = 0; i < dungeon->nr; i++) {
 		dists[i] = 0;
 	}
 	//memset(dists, 0.0, dungeon->nr * sizeof(double));
 	int max_paths = dungeon->nr * 3;
-	Path paths[max_paths]; /* max paths is 3 * number of rooms */
+	Path *paths = calloc(max_paths, sizeof(Path)); /* max paths is 3 * number of rooms */
 	int path_cnt = 0;
 	int	room_pos = 0; /* current room in use */
 
@@ -240,7 +240,11 @@ void gen_corridors(Dungeon * dungeon) {
 		}
 
 	}
-
+	
+	// Frees -- not properly adjusted
+	free(connected);
+	free(dists);
+	free(paths);
 }
 
 /* generate a blank dungeon */

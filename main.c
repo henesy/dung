@@ -1,8 +1,8 @@
 #include <u.h>
 #include <libc.h>
-#include "binheap.h"
+#include <9curses.h>
 #include "dungeon_generator.h"
-
+#include "binheap.h"
 
 /* compare two ints used as costs ;; 0 if same, <0 if higher than key; >0 if lower than key */
 int compare_int(const void *key, const void *with) {
@@ -28,18 +28,21 @@ int h_calc(int h) {
 }
 
 /* djikstra's take 2; with tunnelling */
-void map_dungeon_t(Dungeon * dungeon) {
+void
+map_dungeon_t(Dungeon * dungeon)
+{
+	int i, j;
 	binheap_t h;
-	Tile_Node tiles[dungeon->h][dungeon->w];
+	Tile_Node **tiles;
+	tiles = calloc(dungeon->h, sizeof(Tile_Node*));
+	for(i = 0; i < dungeon->h; i++)
+		tiles[i] = calloc(dungeon->w, sizeof(Tile_Node));
 
 	binheap_init(&h, compare_int, nil);
 
 	/* starts from top left */
 	int xs[8] = {-1,0,1,1,1,0,-1,-1};
 	int ys[8] = {-1,-1,-1,0,1,1,1,0};
-
-	int i;
-	int j;
 
 	/* set all indices and insert the default values */
 	for(i = 0; i < dungeon->h; i++) {
@@ -67,7 +70,6 @@ void map_dungeon_t(Dungeon * dungeon) {
 		int hy = ((Tile_Node *) p)->y;
 		int tc = ((Tile_Node *) p)->cost;
 
-		int i;
 		for(i = 0; i < 8; i++) {
 			int x = hx + xs[i];
 			int y = hy + ys[i];
@@ -92,7 +94,11 @@ void map_dungeon_t(Dungeon * dungeon) {
 			dungeon->cst[i][j] = tiles[i][j].cost;
 		}
 	}
-
+	
+	// Free
+	for(i = 0; i < dungeon->h; i++)
+		free(tiles[i]);
+	free(tiles);
 
 	/* clean up the heap */
 	binheap_delete(&h);
@@ -100,17 +106,18 @@ void map_dungeon_t(Dungeon * dungeon) {
 
 /* djikstra's take 2 */
 void map_dungeon_nont(Dungeon * dungeon) {
+	int i, j;
 	binheap_t h;
-	Tile_Node tiles[dungeon->h][dungeon->w];
+	Tile_Node **tiles;
+	tiles = calloc(dungeon->h, sizeof(Tile_Node*));
+	for(i = 0; i < dungeon->h; i++)
+		tiles[i] = calloc(dungeon->w, sizeof(Tile_Node));
 
 	binheap_init(&h, compare_int, nil);
 
 	/* starts from top left */
 	int xs[8] = {-1,0,1,1,1,0,-1,-1};
 	int ys[8] = {-1,-1,-1,0,1,1,1,0};
-
-	int i;
-	int j;
 
 	/* set all indices and insert the default values */
 	for(i = 0; i < dungeon->h; i++) {
@@ -165,6 +172,10 @@ void map_dungeon_nont(Dungeon * dungeon) {
 		}
 	}
 
+	// Free
+	for(i = 0; i < dungeon->h; i++)
+		free(tiles[i]);
+	free(tiles);
 
 	/* clean up the heap */
 	binheap_delete(&h);
@@ -285,7 +296,7 @@ void write_dungeon(Dungeon * dungeon, char * path) {
 	fdir_path = calloc(strlen(env_home) + 9, sizeof(char));
 	strcpy(fdir_path, env_home);
 	strcat(fdir_path, "/.rlg327");
-	mkdir(fdir_path, 0777);
+	create(fdir_path, ORDWR, 0777);
 	/* mkdir will return -1 when it fails, but it will fail if the fd exists so it doesn't especially matter to catch it as no output would be provided */
 
 
@@ -376,8 +387,14 @@ void monster_list(Dungeon * dungeon) {
 	clear();
 	
 	/* monster view array and population */
-	char mons [dungeon->ns-1][30];
-	int i;
+	char **mons;
+	int i, j;
+	s32int k;
+	
+	mons = calloc(dungeon->ns-1, sizeof(char*));
+	for(i = 0; i < dungeon->ns-1; i++)
+		mons[i] = calloc(30, sizeof(char));
+
 	for(i = 1; i < dungeon->ns; i++) {
 		char ns[6];
 		char ew[5];
@@ -411,7 +428,6 @@ void monster_list(Dungeon * dungeon) {
 		bot = dungeon->ns -2;
 	}
 	
-	int j;
 	for(;;) {
 		/* put the monster view to the screen */
 		for(i = top, j = 0; i < dungeon->ns -1 && i <= bot && j < 24; i++, j++) {
@@ -420,7 +436,7 @@ void monster_list(Dungeon * dungeon) {
 		
 		/* handle user interaction */
 		MLV: ;
-		s32int k;
+		
 		k = getch();
 
 		switch(k) {
@@ -459,8 +475,8 @@ void monster_list(Dungeon * dungeon) {
 		wrefresh(w);
 	}
 	
-	delwin(w);
-	print_dungeon(dungeon, 0, 0);
+	//delwin(w);
+	//print_dungeon(dungeon, 0, 0);
 }
 
 /* processes pc movements ;; validity checking is in monsters.c's gen_move_sprite() */
@@ -591,7 +607,7 @@ int main(int argc, char * argv[]) {
 		test_args(argc, argv, 1, &saving, &loading, &pathing, &custom_path, &num_mon, &nnc);
 	} else if(argc > max_args) {
 		/* more than 2 commandline arguments, argv[0] is gratuitous */
-		printf("Too many arguments!\n");
+		print("Too many arguments!\n");
 	} else {
 		/* other; most likely 0 */
 	}
@@ -669,19 +685,14 @@ int main(int argc, char * argv[]) {
 	if(regen == TRUE)
 		goto PNC;
 	
-	/* ncurses or not ;; this will likely amount to nothing */
-	void (*printer)(Dungeon*, int, int);
-	if(nnc == FALSE) {
-		printer = &print_dungeon;
-		initscr();
-		raw();
-		noecho();
-		curs_set(0);
-		set_escdelay(25);
-		keypad(stdscr, TRUE);
-	} else {
-		printer = &print_dungeon_nnc;
-	}
+	// Init ncurses
+	initscr();
+	raw();
+	noecho();
+	curs_set(0);
+	set_escdelay(25);
+	keypad(stdscr, TRUE);
+
 
 	PNC: ;
 	regen = FALSE;
@@ -744,7 +755,7 @@ int main(int argc, char * argv[]) {
 		}
 		first = FALSE;
 	}
-	printer(&dungeon, 0, 0);
+	print_dungeon(&dungeon, 0, 0);
 	//printf("Game Over!\n");
 
 	/*** tear down sequence ***/

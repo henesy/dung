@@ -1,6 +1,6 @@
-#ifndef dungeon_generator
-#define dungeon_generator
-#include "binheap.h"
+#ifndef dungeon_h
+#define dungeon_h
+
 /* set up Booleans */
 #define	TRUE	1
 #define	FALSE	0
@@ -91,6 +91,7 @@ typedef struct {
 	int			turn;	/* turn counter */
 	Position	to;		/* where we move to */
 } Event;
+
 
 /*** Function prototypes ***/
 /* monsters.c */

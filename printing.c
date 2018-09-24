@@ -1,11 +1,7 @@
 #include <u.h>
 #include <libc.h>
+#include <9curses.h>
 #include "dungeon_generator.h"
-
-
-/* print hardness */
-void print_hardness(Dungeon * dungeon) {
-}
 
 /* prints heatmap */
 void print_t_heatmap(Dungeon * dungeon) {
@@ -15,16 +11,16 @@ void print_t_heatmap(Dungeon * dungeon) {
 		for(j = 0; j < dungeon->w; j++) {
 			int c = dungeon->cst[i][j];
 			if(c >= 0 && c < 10) {
-				printf("%d", c);
+				print("%d", c);
 			} else if(c >= 10 && c < 36) {
-				printf("%c", 'a' + (c - 10));
+				print("%c", 'a' + (c - 10));
 			} else if(c >= 36 && c < 62) {
-				printf("%c", 'A' + (c - 36));
+				print("%c", 'A' + (c - 36));
 			} else {
-				printf("%c", dungeon->d[i][j].c);
+				print("%c", dungeon->d[i][j].c);
 			}
 		}
-		printf("\n");
+		print("\n");
 	}
 
 }
@@ -37,16 +33,16 @@ void print_nont_heatmap(Dungeon * dungeon) {
 		for(j = 0; j < dungeon->w; j++) {
 			int c = dungeon->csnt[i][j];
 			if(c >= 0 && c < 10) {
-				printf("%d", c);
+				print("%d", c);
 			} else if(c >= 10 && c < 36) {
-				printf("%c", 'a' + (c - 10));
+				print("%c", 'a' + (c - 10));
 			} else if(c >= 36 && c < 62) {
-				printf("%c", 'A' + (c - 36));
+				print("%c", 'A' + (c - 36));
 			} else {
-				printf("%c", dungeon->d[i][j].c);
+				print("%c", dungeon->d[i][j].c);
 			}
 		}
-		printf("\n");
+		print("\n");
 	}
 
 }
@@ -88,7 +84,7 @@ void print_dungeon(Dungeon * dungeon, int nt, int t) {
 
 	/* add sprites to the print buffer */
 	for(i = 0; i < dungeon->ns; i++) {
-		//printf("%d, %d: %c speed: %d turn: %d\n", dungeon->ss[i].p.y, dungeon->ss[i].p.x, dungeon->ss[i].c, dungeon->ss[i].s.s, dungeon->ss[i].t);
+		//print("%d, %d: %c speed: %d turn: %d\n", dungeon->ss[i].p.y, dungeon->ss[i].p.x, dungeon->ss[i].c, dungeon->ss[i].s.s, dungeon->ss[i].t);
 		if(dungeon->ss[i].a == TRUE)
 			dungeon->p[dungeon->ss[i].p.y][dungeon->ss[i].p.x].c = dungeon->ss[i].c;
 	}
@@ -131,7 +127,7 @@ void print_dungeon(Dungeon * dungeon, int nt, int t) {
 	for(i = 0; i < dungeon->h; i++) {
 		int j;
 		for(j = 0; j < dungeon->w; j++) {
-			//printf("%c", (dungeon->p[i][j]).c);
+			//print("%c", (dungeon->p[i][j]).c);
             mvaddch(i+1, j, (dungeon->p[i][j]).c);
 		}
 	}
@@ -171,7 +167,7 @@ void print_dungeon_nnc(Dungeon * dungeon, int nt, int t) {
 
 	/* add sprites to the print buffer */
 	for(i = 0; i < dungeon->ns; i++) {
-		//printf("%d, %d: %c speed: %d turn: %d\n", dungeon->ss[i].p.y, dungeon->ss[i].p.x, dungeon->ss[i].c, dungeon->ss[i].s.s, dungeon->ss[i].t);
+		//print("%d, %d: %c speed: %d turn: %d\n", dungeon->ss[i].p.y, dungeon->ss[i].p.x, dungeon->ss[i].c, dungeon->ss[i].s.s, dungeon->ss[i].t);
 		if(dungeon->ss[i].a == TRUE)
 			dungeon->p[dungeon->ss[i].p.y][dungeon->ss[i].p.x].c = dungeon->ss[i].c;
 	}
@@ -214,8 +210,8 @@ void print_dungeon_nnc(Dungeon * dungeon, int nt, int t) {
 	for(i = 0; i < dungeon->h; i++) {
 		int j;
 		for(j = 0; j < dungeon->w; j++) {
-			printf("%c", (dungeon->p[i][j]).c);
+			print("%c", (dungeon->p[i][j]).c);
 		}
-		printf("\n");
+		print("\n");
 	}
 }

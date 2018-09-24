@@ -1,16 +1,17 @@
-#ifndef BINHEAP_H
-#define BINHEAP_H
+#ifndef binheap_h
+#define binheap_h
 
 struct binheap_node;
 typedef struct binheap_node binheap_node_t;
+typedef struct binheap_t binheap_t;
 
-typedef struct binheap {
+struct binheap_t {
   binheap_node_t **array;
   u32int size;
   u32int array_size;
   s32int (*compare)(const void *key, const void *with);
   void (*datum_delete)(void *);
-} binheap_t;
+};
 
 void binheap_init(binheap_t *h,
                   s32int (*compare)(const void *key, const void *with),

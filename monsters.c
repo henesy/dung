@@ -1,7 +1,6 @@
 #include <u.h>
 #include <libc.h>
 #include "dungeon_generator.h"
-#include "binheap.h"
 
 /* check if we can move to a location (objectively) */
 Bool test_loc(Dungeon * dungeon, int x, int y, Sprite *s) {
