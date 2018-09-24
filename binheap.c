@@ -57,9 +57,8 @@ static void heapify(binheap_t *h)
   percolate_down(h, 0);
 }
 
-void binheap_init(binheap_t *h,
-                  s32int (*compare)(const void *key, const void *with),
-                  void (*datum_delete)(void *))
+void
+binheap_init(binheap_t *h, s32int (*compare)(const void *key, const void *with), void (*datum_delete)(void *))
 {
   h->size = 0;
   h->array_size = BINHEAP_START_SIZE;
